@@ -27,10 +27,10 @@ async def m3u(request: Request, m3uFileName: str):
     port = request.url.port
     scheme = request.url.scheme
 
-    port = port if port != None else ("80" if scheme == "http" else "443")
+    port = port if port != None else "443" if scheme == "https" else "80"
     
     params = request.query_params
-    args = {"request": request, "hostname": hostname, "port": port}
+    args = {"request": request, "hostname": hostname, "port": port, "scheme": scheme} 
     args.update(params)
 
     return templates.TemplateResponse(f"{m3uFileName}.m3u", args)

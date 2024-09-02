@@ -10,6 +10,7 @@ ENV ACESTREAM_VERSION="3.2.3_ubuntu_22.04_x86_64_py3.10"
 
 WORKDIR /tmp
 COPY app /app
+COPY data /data
 
 SHELL ["/bin/bash", "-c" ]
 RUN apt-get update
