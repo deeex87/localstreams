@@ -13,7 +13,8 @@ Para instalar LocalStreams, sigue estos pasos:
     git clone https://github.com/deeex87/localstreams.git
     ```
 2. Ejecuta el contenedor:
-    ```docker run 
+    ```
+        docker run 
         -it --name localstream \
         --publish 15123:15123 \                                             #puertos de la aplicación
         -l com.centurylinklabs.watchtower.enable=false -l wud.watch=false   #esto es util si usas watchtower o whatsupdocker \
