@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
-APP_PORT=int(os.getenv("APP_PORT", "15124"))
+APP_PORT=int(os.getenv("APP_PORT", "15123"))
 STREAMLINK_BINARY = os.getenv("STREAMLINK_BINARY", "/app/venv/bin/streamlink")
 ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
 M3U_DIR = os.getenv("M3U_DIR", "/data/m3u")
