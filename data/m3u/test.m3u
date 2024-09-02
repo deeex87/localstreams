@@ -1,0 +1,8 @@
+#EXTM3U
+#EXTVLCOPT--http-reconnect=true
+
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Logo_TVE-Internacional.svg/1403px-Logo_TVE-Internacional.svg.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
+http://{{hostname}}:{{port}}/streamlink/video?url=https://www.rtve.es/play/videos/directo/canales-lineales/la-1/
+
+#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Logo_TVE-Internacional.svg/1403px-Logo_TVE-Internacional.svg.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
+http://{{hostname}}:{{port}}/acestream/id?b897de3e62d7c6bee9ef1107d972f3d1075e03ff

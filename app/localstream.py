@@ -1,5 +1,3 @@
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import StreamingResponse
 import subprocess
 import requests
 import os
@@ -7,15 +5,37 @@ import random
 import signal
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.templating import Jinja2Templates
+
 
 app = FastAPI()
 
-APP_PORT=int(os.getenv("APP_PORT", "15123"))
+APP_PORT=int(os.getenv("APP_PORT", "15124"))
 STREAMLINK_BINARY = os.getenv("STREAMLINK_BINARY", "/app/venv/bin/streamlink")
 ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
+M3U_DIR = os.getenv("M3U_DIR", "/data/m3u")
 
+templates = Jinja2Templates(directory=M3U_DIR)
 
 ###################### STREAMLINK ######################
+
+@app.get("/m3u/{m3uFileName}.m3u")
+async def m3u(request: Request, m3uFileName: str):
+    hostname = request.client.host
+    port = request.client.port
+    
+    params = request.query_params
+    args = {"request": request, "hostname": hostname, "port": port}
+    args.update(params)
+
+    return templates.TemplateResponse(f"{m3uFileName}.m3u", args)
+
+@app.get("/picon/{piconFileName}")
+async def piconFile(piconFileName: str):
+    filename = f"/data/picon/{piconFileName}"
+    return FileResponse(filename, media_type='image/gif')
 
 @app.get("/streamlink/video")
 async def stream(request: Request):
