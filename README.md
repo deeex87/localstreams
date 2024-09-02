@@ -14,6 +14,7 @@ Para instalar LocalStreams, sigue estos pasos:
     ```
 3. Construye la imagen:
     ```bash
+    chmod +x build.sh
     ./build.sh
     ```
 4. Ejecuta el contenedor:

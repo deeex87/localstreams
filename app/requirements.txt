@@ -2,3 +2,4 @@ streamlink
 uvicorn
 fastapi
 urllib3
+jinja2
