@@ -1,0 +1,4 @@
+streamlink
+uvicorn
+fastapi
+urllib3
