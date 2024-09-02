@@ -41,7 +41,7 @@ Por ejemplo, para la lista que se obtiene en esta url:
 
     http://127.0.0.1:15123/m3u/test.m3u?iptvserver=192.168.1.11:8080
 
-puedes usar la plantilla:
+puedes usar la variable `iptvserver` en la plantilla (además de las variables por defecto):
 
     #EXTM3U
     #EXTVLCOPT--http-reconnect=true
@@ -54,6 +54,8 @@ puedes usar la plantilla:
 
     #EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Logo_TVE-Internacional.svg/1403px-Logo_TVE-Internacional.svg.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
     http://{{hostname}}:{{port}}/acestream/video?id=b897de3e62d7c6bee9ef1107d972f3d1075e03ff
+
+Se pueden pasar tantas variables en el query string como se desee.
 
 ## Licencia
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
