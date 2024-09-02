@@ -34,10 +34,12 @@ Además puedes acceder a streams de acestream y streamlink en los siguientes end
     http://{{hostname}}:{{port}}/streamlink/video?url={url_streamlink} #Soporta cualquier url soportada por los plugins de streamlink
 
 Por ejemplo, para la lista que se obtiene en esta url:
+
     ```
     http://127.0.0.1:15123/m3u/test.m3u?iptvserver=192.168.1.11:8080
     ``` 
 puedes usar la plantilla:
+
     ```
     #EXTM3U
     #EXTVLCOPT--http-reconnect=true
