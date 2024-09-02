@@ -23,9 +23,9 @@ templates = Jinja2Templates(directory=M3U_DIR)
 
 @app.get("/m3u/{m3uFileName}.m3u")
 async def m3u(request: Request, m3uFileName: str):
-    hostname = request.url.hostname
-    port = request.url.port
-    scheme = request.url.scheme
+    hostname = request.base_url.hostname
+    port = request.base_url.port
+    scheme = request.base_url.scheme
 
     port = port if port != None else "443" if scheme == "https" else "80"
     
