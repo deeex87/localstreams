@@ -17,6 +17,10 @@ STREAMLINK_BINARY = os.getenv("STREAMLINK_BINARY", "/app/venv/bin/streamlink")
 ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
 M3U_DIR = os.getenv("M3U_DIR", "/data/m3u")
 
+ACESTREAM_RETRY_BACKOFF_FACTOR = int(os.getenv("ACESTREAM_RETRY_BACKOFF_FACTOR", "1"))
+ACESTREAM_RETRY_STATUS_FORCELIST = os.getenv("ACESTREAM_RETRY_STATUS_FORCELIST", "500,502,503,504").split(",")
+ACESTRAM_RETRY_TOTAL = int(os.getenv("ACESTREAM_RETRY_TOTAL", "5"))
+
 templates = Jinja2Templates(directory=M3U_DIR)
 
 ###################### STREAMLINK ######################
@@ -136,9 +140,9 @@ async def acestream(request: Request):
     def stream_content():
         session = requests.Session()
         retry = Retry(
-            total = 5,
-            backoff_factor = 0.3,
-            status_forcelist = [500, 502, 503, 504] 
+            total = ACESTRAM_RETRY_TOTAL,
+            backoff_factor = ACESTREAM_RETRY_BACKOFF_FACTOR,
+            status_forcelist = ACESTREAM_RETRY_STATUS_FORCELIST
         )
         adapter = HTTPAdapter(max_retries=retry)
         session.mount("http://", adapter)
