@@ -23,8 +23,8 @@ templates = Jinja2Templates(directory=M3U_DIR)
 
 @app.get("/m3u/{m3uFileName}.m3u")
 async def m3u(request: Request, m3uFileName: str):
-    hostname = request.client.host
-    port = request.client.port
+    hostname = request.url.hostname
+    port = request.url.port
     
     params = request.query_params
     args = {"request": request, "hostname": hostname, "port": port}
