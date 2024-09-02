@@ -12,7 +12,11 @@ Para instalar LocalStreams, sigue estos pasos:
     ```bash
     git clone https://github.com/deeex87/localstreams.git
     ```
-2. Ejecuta el contenedor:
+3. Construye la imagen:
+    ```bash
+    ./build.sh
+    ```
+4. Ejecuta el contenedor:
     ```
     docker run 
         -it --name localstream \
