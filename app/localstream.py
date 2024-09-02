@@ -25,6 +25,9 @@ templates = Jinja2Templates(directory=M3U_DIR)
 async def m3u(request: Request, m3uFileName: str):
     hostname = request.url.hostname
     port = request.url.port
+    scheme = request.url.scheme
+
+    port = port if port else "80" if scheme == "http" else "443"
     
     params = request.query_params
     args = {"request": request, "hostname": hostname, "port": port}
