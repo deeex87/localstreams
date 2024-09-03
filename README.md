@@ -1,6 +1,6 @@
 # LocalStreams
 
-LocalStreams es una aplicación diseñada para facilitar la generación de playlist m3u de canales de TV. Este proyecto permite a los usuarios acceder facilmente a una playlist customizada con los canales de televisión que emiten por internet, así como a traves de Acestream y StreamLink.
+LocalStreams es una contenedor de docker diseñado para facilitar la generación de playlist m3u de canales de TV. Este proyecto permite a los usuarios acceder facilmente a una playlist customizada con los canales de televisión que emiten por internet, así como a traves de Acestream y StreamLink.
 
 ## Instalación
 
@@ -20,20 +20,20 @@ Para instalar LocalStreams, sigue estos pasos:
 4. Ejecuta el contenedor:
     ```
     docker run 
-        -it --name localstream \
+        -it --name localstreams \
         --publish 15123:15123 \                                             #puertos de la aplicación
         -l com.centurylinklabs.watchtower.enable=false -l wud.watch=false   #esto es util si usas watchtower o whatsupdocker \
         --restart always \
-        -v <path/a/carpeta/con/m3u>:/data/m3u \
-        -v <path/a/carpeta/con/picon>:/data/picon \ 
-        deeex87/localstream
+        -v <path/a/carpeta/con/m3u>:/data/m3u \                             #ruta de la carpeta que contiene los m3u
+        -v <path/a/carpeta/con/picon>:/data/picon \                         #ruta de la carpeta que contiene los picon
+        deeex87/localstreams
     ```
 
 ## Uso
 
-Las plantillas m3u admiten el formato jinja2, por lo que puedes usar las variables de la aplicación como {{hostname}} y {{port}}, además de cualquier parametro que pases por url. 
+Las plantillas m3u admiten el formato jinja2, por lo que puedes usar las variables de la aplicación como {{schema}}, {{hostname}} o {{port}}, además de cualquier parametro que pases por url. 
 
-Además puedes acceder a streams de acestream y streamlink en los siguientes endpoints especiales:
+Puedes acceder a streams de acestream y streamlink en los siguientes endpoints especiales:
 
     http://{{hostname}}:{{port}}/acestream/video?id={id_acestream}
     http://{{hostname}}:{{port}}/streamlink/video?url={url_streamlink} #Soporta cualquier url soportada por los plugins de streamlink
@@ -51,10 +51,10 @@ puedes usar la variable `iptvserver` en la plantilla (además de las variables p
     http://{{iptvserver}}/stream.ts
 
     #EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Logo_TVE-Internacional.svg/1403px-Logo_TVE-Internacional.svg.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
-    http://{{hostname}}:{{port}}/streamlink/video?url=https://www.rtve.es/play/videos/directo/canales-lineales/la-1/
+    {{schema}}://{{hostname}}:{{port}}/streamlink/video?url=https://www.rtve.es/play/videos/directo/canales-lineales/la-1/
 
     #EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Logo_TVE-Internacional.svg/1403px-Logo_TVE-Internacional.svg.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
-    http://{{hostname}}:{{port}}/acestream/video?id=b897de3e62d7c6bee9ef1107d972f3d1075e03ff
+    {{schema}}://{{hostname}}:{{port}}/acestream/video?id=b897de3e62d7c6bee9ef1107d972f3d1075e03ff
 
 Se pueden pasar tantas variables en el query string como se desee.
 
