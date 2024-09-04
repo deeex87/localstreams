@@ -128,7 +128,7 @@ async def acestream(request: Request):
         raise HTTPException(status_code=400, detail="id parameter is missing")
 
     acestream_random_port = random.randint(65500, 65534)
-    command = [ACESTREAM_BINARY, "--client-console", "--http-port", f"{acestream_random_port}", "--cache-dir", "/tmp/acestream-cache", "--bind-all", ACESTREAM_ARGS]
+    command = [ACESTREAM_BINARY, "--client-console", "--http-port", f"{acestream_random_port}", "--cache-auto", "--cache-dir", "/tmp/acestream-cache", "--bind-all", ACESTREAM_ARGS]
     acestream_process = subprocess.Popen(command, 
                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
