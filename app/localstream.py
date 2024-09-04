@@ -3,6 +3,7 @@ import requests
 import os
 import random
 import signal
+import shutil
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from fastapi import FastAPI, Request, HTTPException
@@ -12,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
+ACESTREAM_CACHE_DIR = "/tmp/acestream-cache"
 APP_PORT=int(os.getenv("APP_PORT", "15123"))
 STREAMLINK_BINARY = os.getenv("STREAMLINK_BINARY", "/app/venv/bin/streamlink")
 ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
@@ -23,6 +25,8 @@ ACESTREAM_RETRY_BACKOFF_FACTOR = int(os.getenv("ACESTREAM_RETRY_BACKOFF_FACTOR",
 ACESTREAM_RETRY_STATUS_FORCELIST = os.getenv("ACESTREAM_RETRY_STATUS_FORCELIST", "500,502,503,504").split(",")
 ACESTRAM_RETRY_TOTAL = int(os.getenv("ACESTREAM_RETRY_TOTAL", "5"))
 
+
+shutil.rmtree(ACESTREAM_CACHE_DIR, ignore_errors=True)
 templates = Jinja2Templates(directory=M3U_DIR)
 
 ###################### STREAMLINK ######################
@@ -129,7 +133,9 @@ async def acestream(request: Request):
         raise HTTPException(status_code=400, detail="id parameter is missing")
 
     acestream_random_port = random.randint(65500, 65534)
-    command = [ACESTREAM_BINARY, "--client-console", "--http-port", f"{acestream_random_port}", "--cache-dir", "/tmp/acestream-cache", "--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", "--bind-all", ACESTREAM_ARGS]
+    command = [ACESTREAM_BINARY, "--client-console", "--http-port", f"{acestream_random_port}", 
+               "--cache-dir", f"{ACESTREAM_CACHE_DIR}/{id}", "--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
+               "", "--bind-all", ACESTREAM_ARGS]
     acestream_process = subprocess.Popen(command, 
                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
