@@ -15,6 +15,7 @@ app = FastAPI()
 APP_PORT=int(os.getenv("APP_PORT", "15123"))
 STREAMLINK_BINARY = os.getenv("STREAMLINK_BINARY", "/app/venv/bin/streamlink")
 ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
+ACESTREAM_CACHE_LIMIT = os.getenv("ACESTREAM_CACHE_LIMIT", "1")
 ACESTREAM_ARGS = os.getenv("ACESTREAM_ARGS", "") 
 M3U_DIR = os.getenv("M3U_DIR", "/data/m3u")
 
@@ -128,7 +129,7 @@ async def acestream(request: Request):
         raise HTTPException(status_code=400, detail="id parameter is missing")
 
     acestream_random_port = random.randint(65500, 65534)
-    command = [ACESTREAM_BINARY, "--client-console", "--http-port", f"{acestream_random_port}", "--cache-auto", "true", "--cache-dir", "/tmp/acestream-cache", "--bind-all", ACESTREAM_ARGS]
+    command = [ACESTREAM_BINARY, "--client-console", "--http-port", f"{acestream_random_port}", "--cache-dir", "/tmp/acestream-cache", "--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", "--bind-all", ACESTREAM_ARGS]
     acestream_process = subprocess.Popen(command, 
                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
