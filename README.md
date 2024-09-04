@@ -10,7 +10,7 @@ Para instalar LocalStreams, sigue estos pasos:
 
 2. Clona el repositorio:
     ```bash
-    git clone https://github.com/deeex87/localstreams.git
+    git clone https://github.com/franlerma/localstreams.git
     ```
 3. Construye la imagen:
     ```bash
