@@ -26,7 +26,7 @@ Para instalar LocalStreams, sigue estos pasos:
         --restart always \
         -v <path/a/carpeta/con/m3u>:/data/m3u \                             #ruta de la carpeta que contiene los m3u
         -v <path/a/carpeta/con/picon>:/data/picon \                         #ruta de la carpeta que contiene los picon
-        deeex87/localstreams
+        franlerma/localstreams
     ```
 
 ## Uso

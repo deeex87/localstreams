@@ -3,8 +3,8 @@
 
 #ESTE ES UN ARCHIVO M3U DE EJEMPLO
 
-#EXTINF:-1 tvg-logo="{{schema}}:{{hostname}}:{{port}}/picon/TVE.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
-{{schema}}://{{hostname}}:{{port}}/streamlink/video?url=https://www.rtve.es/play/videos/directo/canales-lineales/la-1/
+#EXTINF:-1 tvg-logo="{{schema}}://{{hostname}}:{{port}}/picon/TVE.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
+{{scheme}}://{{hostname}}:{{port}}/streamlink/video?url=https://www.rtve.es/play/videos/directo/canales-lineales/la-1/
 
 #EXTINF:-1 tvg-logo="{{schema}}:{{hostname}}:{{port}}/picon/TVE.png" tvg-name="LA 1 HD" tvg-id="LA1.es", La 1
-{{schema}}://{{hostname}}:{{port}}/acestream/id?b897de3e62d7c6bee9ef1107d972f3d1075e03ff
+{{scheme}}://{{hostname}}:{{port}}/acestream/id?b897de3e62d7c6bee9ef1107d972f3d1075e03ff
