@@ -31,12 +31,12 @@ Para instalar LocalStreams, sigue estos pasos:
 
 ## Uso
 
-Las plantillas m3u admiten el formato jinja2, por lo que puedes usar las variables de la aplicación como `{{schema}}`, `{{hostname}}` o `{{port}}`, además de cualquier parametro que pases por url. 
+Las plantillas m3u admiten el formato jinja2, por lo que puedes usar las variables de la aplicación como `{{scheme}}`, `{{hostname}}`, `{{port}}` o {{base_url}} además de cualquier parametro que pases por url. 
 
 Puedes acceder a streams de acestream y streamlink en los siguientes endpoints especiales:
 
-    {{schema}}://{{hostname}}:{{port}}/acestream/video?id={id_acestream}
-    {{schema}}://{{hostname}}:{{port}}/streamlink/video?url={url_streamlink} #Soporta cualquier url soportada por los plugins de streamlink
+    {{scheme}}://{{hostname}}:{{port}}/acestream/video?id={id_acestream}
+    {{base_url}}/streamlink/video?url={url_streamlink} #Soporta cualquier url soportada por los plugins de streamlink
 
 Por ejemplo, para la lista que se obtiene en esta url:
 
