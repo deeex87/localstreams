@@ -155,8 +155,8 @@ async def acestream(request: Request):
     def stream_content():
         session = requests.Session()
         retry = Retry(
-            total = ACESTRAM_RETRY_TOTAL,
-            backoff_factor = ACESTREAM_RETRY_BACKOFF_FACTOR,
+            total = int(ACESTRAM_RETRY_TOTAL),
+            backoff_factor = float(ACESTREAM_RETRY_BACKOFF_FACTOR),
             status_forcelist = ACESTREAM_RETRY_STATUS_FORCELIST
         )
         adapter = HTTPAdapter(max_retries=retry)
