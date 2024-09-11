@@ -165,7 +165,7 @@ async def acestream(request: Request):
         session.mount("https://", adapter)        
         response = session.get(ace_url, stream=True)
         for chunk in response.iter_content(chunk_size=1024):
-            time.sleep(ACESTREAM_POLL_TIME)
+            time.sleep(int(ACESTREAM_POLL_TIME))
             yield chunk
         acestream_process.kill()
 
