@@ -3,6 +3,7 @@ import requests
 import os
 import random
 import signal
+import time
 import shutil
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -24,6 +25,7 @@ M3U_DIR = os.getenv("M3U_DIR", "/data/m3u")
 ACESTREAM_RETRY_BACKOFF_FACTOR = os.getenv("ACESTREAM_RETRY_BACKOFF_FACTOR", "2")
 ACESTREAM_RETRY_STATUS_FORCELIST = os.getenv("ACESTREAM_RETRY_STATUS_FORCELIST", "500,502,503,504").split(",")
 ACESTRAM_RETRY_TOTAL = os.getenv("ACESTREAM_RETRY_TOTAL", "5")
+ACESTREAM_POLL_TIME = os.getenv("ACESTREAM_POLL_TIME", "0.1")
 
 shutil.rmtree(ACESTREAM_CACHE_DIR, ignore_errors=True)
 templates = Jinja2Templates(directory=M3U_DIR)
@@ -163,6 +165,7 @@ async def acestream(request: Request):
         session.mount("https://", adapter)        
         response = session.get(ace_url, stream=True)
         for chunk in response.iter_content(chunk_size=1024):
+            time.time.sleep(ACESTREAM_POLL_TIME)
             yield chunk
         acestream_process.kill()
 
@@ -176,7 +179,7 @@ async def acestream(request: Request):
                     break
                 
     try :
-        return CustomStreamingResponse(stream_content(), media_type='application/x-mpegURL')
+        return CustomStreamingResponse(stream_content(), media_type='video/mp4')
     except Exception as e:
         print(e)
         acestream_process.kill()
