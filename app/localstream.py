@@ -25,7 +25,6 @@ ACESTREAM_RETRY_BACKOFF_FACTOR = os.getenv("ACESTREAM_RETRY_BACKOFF_FACTOR", "2"
 ACESTREAM_RETRY_STATUS_FORCELIST = os.getenv("ACESTREAM_RETRY_STATUS_FORCELIST", "500,502,503,504").split(",")
 ACESTRAM_RETRY_TOTAL = os.getenv("ACESTREAM_RETRY_TOTAL", "5")
 
-
 shutil.rmtree(ACESTREAM_CACHE_DIR, ignore_errors=True)
 templates = Jinja2Templates(directory=M3U_DIR)
 
@@ -50,7 +49,7 @@ async def m3u(request: Request, m3uFileName: str):
     }
     args.update(params)
 
-    return templates.TemplateResponse(f"{m3uFileName}.m3u", args)
+    return templates.TemplateResponse(f"{m3uFileName}.m3u", args, media_type='text/plain')
 
 @app.get("/picon/{piconFileName}")
 async def piconFile(piconFileName: str):
@@ -177,7 +176,7 @@ async def acestream(request: Request):
                     break
                 
     try :
-        return CustomStreamingResponse(stream_content(), media_type="video/mp2t")
+        return CustomStreamingResponse(stream_content(), media_type='application/x-mpegURL')
     except Exception as e:
         print(e)
         acestream_process.kill()
