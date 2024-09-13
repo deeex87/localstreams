@@ -1,0 +1,1 @@
+docker run -it --name localstreams --publish 15123:15123 -l com.centurylinklabs.watchtower.enable=false -l wud.watch=false --restart always -v /opt/docker/volumes/localstreams/m3u:/data/m3u  -v /opt/docker/volumes/localstreams/picon:/data/picon -v /opt/docker/volumes/localstreams/tmp:/tmp/acestream-cache franlerma/localstreams
