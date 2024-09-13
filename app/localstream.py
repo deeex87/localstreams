@@ -5,6 +5,8 @@ import random
 import signal
 import time
 import shutil
+import psutil
+import logging
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from fastapi import FastAPI, Request, HTTPException
@@ -22,13 +24,20 @@ ACESTREAM_CACHE_LIMIT = os.getenv("ACESTREAM_CACHE_LIMIT", "1")
 ACESTREAM_ARGS = os.getenv("ACESTREAM_ARGS", "") 
 M3U_DIR = os.getenv("M3U_DIR", "/data/m3u")
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")
+
 ACESTREAM_RETRY_BACKOFF_FACTOR = os.getenv("ACESTREAM_RETRY_BACKOFF_FACTOR", "2")
 ACESTREAM_RETRY_STATUS_FORCELIST = os.getenv("ACESTREAM_RETRY_STATUS_FORCELIST", "500,502,503,504").split(",")
-ACESTRAM_RETRY_TOTAL = os.getenv("ACESTREAM_RETRY_TOTAL", "5")
-ACESTREAM_POLL_TIME = os.getenv("ACESTREAM_POLL_TIME", "0.1")
+ACESTRAM_RETRY_TOTAL = os.getenv("ACESTREAM_RETRY_TOTAL", "10")
+ACESTREAM_POLL_TIME = os.getenv("ACESTREAM_POLL_TIME", "0.10")
+ACESTREAM_STREAM_CHUNKSIZE = os.getenv("ACESTREAM_STREAM_CHUNKSIZE", "1024")
 
 shutil.rmtree(ACESTREAM_CACHE_DIR, ignore_errors=True)
 templates = Jinja2Templates(directory=M3U_DIR)
+
+#LOGGER
+logger = logging.getLogger('uvicorn.error')
+logger.setLevel(logging.getLevelName(LOG_LEVEL))
 
 ###################### STREAMLINK ######################
 
@@ -73,6 +82,8 @@ async def stream(request: Request):
                 output = streamlink_process.stdout.read(1024)
                 if not output:
                     streamlink_process.kill()
+                    streamlink_process.wait()
+                    logger.info("Streamlink process terminated pid: %s", streamlink_process.pid)
                     break
                 yield output
                 
@@ -82,6 +93,8 @@ async def stream(request: Request):
                     message = await receive()
                     if message["type"] == "http.disconnect":
                         streamlink_process.kill()
+                        streamlink_process.wait()
+                        logger.info("Streamlink process terminated pid: %s", streamlink_process.pid)
                         break
             
         return CustomStreamingResponse(generate(), media_type='video/mp4')
@@ -125,6 +138,10 @@ async def get_audio(request: Request):
                     if message["type"] == "http.disconnect":
                         ffmpeg_process.kill()
                         streamlink_process.kill()
+                        ffmpeg_process.wait()
+                        logger.info("FFMPEG process terminated pid: %s", ffmpeg_process.pid)
+                        streamlink_process.wait()
+                        logger.info("Streamlink process terminated pid: %s", streamlink_process.pid)
                         break
 
         return CustomStreamingResponse(iter_audio(), media_type="audio/mpeg")
@@ -133,27 +150,24 @@ async def get_audio(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
     
 ###################### ACESTREAM ######################        
-        
+
+command = [ ACESTREAM_BINARY, "--client-console", "--http-port", "33666", 
+                   "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
+                   "", "--bind-all", ACESTREAM_ARGS]
+acestream_process = subprocess.Popen(command, 
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
 @app.get("/acestream/video")
 async def acestream(request: Request):
     id = request.query_params.get('id')
     if not id:
         raise HTTPException(status_code=400, detail="id parameter is missing")
 
-    acestream_random_port = random.randint(65500, 65534)
-    command = [ACESTREAM_BINARY, "--client-console", "--http-port", f"{acestream_random_port}", 
-               "--cache-dir", f"{ACESTREAM_CACHE_DIR}/{id}", "--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
-               "", "--bind-all", ACESTREAM_ARGS]
-    acestream_process = subprocess.Popen(command, 
-                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     if not acestream_process or acestream_process.poll() is not None:
-        acestream_process.kill()
-        raise HTTPException(status_code=500, detail="Video not found")
+        raise HTTPException(status_code=500, detail="Video not found")    
 
-    ace_url = f"http://127.0.0.1:{acestream_random_port}/ace/getstream?id={id}"
-
-    def stream_content():
+    def stream_content(id):
+        ace_url = f"http://127.0.0.1:33666/ace/getstream?id={id}"
         session = requests.Session()
         retry = Retry(
             total = int(ACESTRAM_RETRY_TOTAL),
@@ -164,25 +178,16 @@ async def acestream(request: Request):
         session.mount("http://", adapter)
         session.mount("https://", adapter)        
         response = session.get(ace_url, stream=True)
-        for chunk in response.iter_content(chunk_size=1024):
-            time.sleep(int(ACESTREAM_POLL_TIME))
-            yield chunk
-        acestream_process.kill()
-
-    class CustomStreamingResponse(StreamingResponse):
-        async def listen_for_disconnect(self, receive) -> None:
-            while True:
-                message = await receive()
-                if message["type"] == "http.disconnect":
-                    acestream_process.send_signal(signal.SIGTERM)
-                    acestream_process.kill()
-                    break
+        while True:
+            for chunk in response.iter_content(chunk_size=int(ACESTREAM_STREAM_CHUNKSIZE)):
+                time.sleep(int(ACESTREAM_POLL_TIME))
+                yield chunk
+            time.sleep(int(ACESTREAM_POLL_TIME)+1)
                 
     try :
-        return CustomStreamingResponse(stream_content(), media_type='video/mp4')
+        return StreamingResponse(stream_content(id), media_type='video/mp4')
     except Exception as e:
-        print(e)
-        acestream_process.kill()
+        logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
     
 #TEST:
