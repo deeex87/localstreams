@@ -1,11 +1,8 @@
 import subprocess
 import requests
 import os
-import random
-import signal
 import time
 import shutil
-import psutil
 import logging
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry

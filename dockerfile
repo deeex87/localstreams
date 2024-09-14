@@ -27,7 +27,7 @@ RUN apt-get update
 #   && bash ./install_dependencies.sh \
 #   && popd || exit
 RUN apt-get install --no-install-recommends -y \
-      python3.10 ffmpeg python3-pip python3-virtualenv python3-venv ca-certificates wget sudo\
+python3-pip libpython3.10 ffmpeg python3-pip python3-virtualenv python3-venv ca-certificates wget sudo\
   && rm -rf /var/lib/apt/lists/* \
 #  && cp -pr /tmp/acestream_${ACESTREAM_VERSION}.tar.gz . \
   && mkdir acestream \
