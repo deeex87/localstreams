@@ -73,6 +73,7 @@ async def stream(request: Request):
                 output = streamlink_process.stdout.read(1024)
                 if not output:
                     streamlink_process.kill()
+                    streamlink_process.wait()
                     break
                 yield output
                 
@@ -82,6 +83,7 @@ async def stream(request: Request):
                     message = await receive()
                     if message["type"] == "http.disconnect":
                         streamlink_process.kill()
+                        streamlink_process.wait()
                         break
             
         return CustomStreamingResponse(generate(), media_type='video/mp4')
