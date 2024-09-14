@@ -11,13 +11,25 @@ ENV ACESTREAM_VERSION="3.2.3_ubuntu_22.04_x86_64_py3.10"
 WORKDIR /tmp
 COPY app /app
 COPY data /data
+COPY resources /tmp
 
 SHELL ["/bin/bash", "-c" ]
 RUN apt-get update
+# RUN apt-get install --no-install-recommends -y \
+#       python3.10 ffmpeg python3-pip python3-virtualenv python3-venv ca-certificates wget sudo\
+#   && rm -rf /var/lib/apt/lists/* \
+# #  && wget --progress=dot:giga "https://download.acestream.media/linux/acestream_${ACESTREAM_VERSION}.tar.gz" \
+#   && mkdir acestream \
+#   && tar zxf "acestream_${ACESTREAM_VERSION}.tar.gz" -C acestream \
+#   && rm "acestream_${ACESTREAM_VERSION}.tar.gz" \
+#   && mv acestream /opt/acestream \
+#   && pushd /opt/acestream || exit \
+#   && bash ./install_dependencies.sh \
+#   && popd || exit
 RUN apt-get install --no-install-recommends -y \
       python3.10 ffmpeg python3-pip python3-virtualenv python3-venv ca-certificates wget sudo\
   && rm -rf /var/lib/apt/lists/* \
-  && wget --progress=dot:giga "https://download.acestream.media/linux/acestream_${ACESTREAM_VERSION}.tar.gz" \
+  && cp -pr /tmp/acestream_${ACESTREAM_VERSION}.tar.gz . \
   && mkdir acestream \
   && tar zxf "acestream_${ACESTREAM_VERSION}.tar.gz" -C acestream \
   && rm "acestream_${ACESTREAM_VERSION}.tar.gz" \
