@@ -179,8 +179,8 @@ async def acestream(request: Request):
         session.mount("https://", adapter)        
         response = session.get(ace_url, stream=True)
         for chunk in response.iter_content(chunk_size=int(ACESTREAM_STREAM_CHUNKSIZE)):
-            time.sleep(int(ACESTREAM_POLL_TIME))
             yield chunk
+            time.sleep(float(ACESTREAM_POLL_TIME))
             
     try :
         return StreamingResponse(stream_content(id), media_type='video/mp4')
