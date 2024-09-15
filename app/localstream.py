@@ -150,12 +150,15 @@ async def get_audio(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
     
 ###################### ACESTREAM ######################        
-
-command = [ ACESTREAM_BINARY, "--client-console", "--http-port", "33666", 
-                   "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
-                   "", "--bind-all", ACESTREAM_ARGS]
-acestream_process = subprocess.Popen(command, 
-                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+try :
+    command = [ ACESTREAM_BINARY, "--client-console", "--http-port", "33666", 
+                    "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
+                    "", "--bind-all", ACESTREAM_ARGS]
+    acestream_process = subprocess.Popen(command, 
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+except Exception as e:
+    logger.error("Error starting acestream")
+    logger.error(e)
 
 @app.get("/acestream/video")
 async def acestream(request: Request):
