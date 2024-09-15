@@ -75,7 +75,6 @@ async def stream(request: Request):
 
     try:
         def generate():
-            
             try :
                 while True:
                     output = streamlink_process.stdout.read(1024)
@@ -86,6 +85,7 @@ async def stream(request: Request):
             finally:
                 streamlink_process.terminate()
                 streamlink_process.wait()
+
                 
         class CustomStreamingResponse(StreamingResponse):
             async def listen_for_disconnect(self, receive) -> None:
