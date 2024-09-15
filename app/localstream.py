@@ -70,26 +70,29 @@ async def stream(request: Request):
     if not url:
         raise HTTPException(status_code=400, detail="URL parameter is missing")
 
-    try:
-        streamlink_process = subprocess.Popen([STREAMLINK_BINARY, url, 'best', '--stdout'], 
-                                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    streamlink_process = subprocess.Popen([STREAMLINK_BINARY, url, 'best', '--stdout'], 
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+    try:
         def generate():
-            while True:
-                output = streamlink_process.stdout.read(1024)
-                if not output:
-                    streamlink_process.kill()
-                    streamlink_process.wait()
-                    logger.info("Streamlink process terminated pid: %s", streamlink_process.pid)
-                    break
-                yield output
+            
+            try :
+                while True:
+                    output = streamlink_process.stdout.read(1024)
+                    if not output:
+                        logger.info("Streamlink process terminated pid: %s", streamlink_process.pid)
+                        break
+                    yield output
+            finally:
+                streamlink_process.terminate()
+                streamlink_process.wait()
                 
         class CustomStreamingResponse(StreamingResponse):
             async def listen_for_disconnect(self, receive) -> None:
                 while True:
                     message = await receive()
                     if message["type"] == "http.disconnect":
-                        streamlink_process.kill()
+                        streamlink_process.terminate()
                         streamlink_process.wait()
                         logger.info("Streamlink process terminated pid: %s", streamlink_process.pid)
                         break
