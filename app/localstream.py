@@ -1,4 +1,5 @@
 import subprocess
+import platform
 import requests
 import os
 import time
@@ -16,9 +17,8 @@ app = FastAPI()
 ACESTREAM_CACHE_DIR = "/tmp/acestream-cache"
 APP_PORT=int(os.getenv("APP_PORT", "15123"))
 STREAMLINK_BINARY = os.getenv("STREAMLINK_BINARY", "/app/venv/bin/streamlink")
-ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
 ACESTREAM_CACHE_LIMIT = os.getenv("ACESTREAM_CACHE_LIMIT", "1")
-ACESTREAM_ARGS = os.getenv("ACESTREAM_ARGS", "") 
+ACESTREAM_ARGS = os.getenv("ACESTREAM_ARGS", "")
 M3U_DIR = os.getenv("M3U_DIR", "/data/m3u")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")
@@ -28,6 +28,9 @@ ACESTREAM_RETRY_STATUS_FORCELIST = os.getenv("ACESTREAM_RETRY_STATUS_FORCELIST",
 ACESTRAM_RETRY_TOTAL = os.getenv("ACESTREAM_RETRY_TOTAL", "10")
 ACESTREAM_POLL_TIME = os.getenv("ACESTREAM_POLL_TIME", "0.10")
 ACESTREAM_STREAM_CHUNKSIZE = os.getenv("ACESTREAM_STREAM_CHUNKSIZE", "1024")
+
+ACESTREAM_IPADDRESS = os.getenv("ACESTREAM_IPADDRESS", "127.0.0.1")
+ACESTREAM_PORT = os.getenv("ACESTREAM_PORT", "6878")
 
 shutil.rmtree(ACESTREAM_CACHE_DIR, ignore_errors=True)
 templates = Jinja2Templates(directory=M3U_DIR)
@@ -150,27 +153,60 @@ async def get_audio(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
     
 ###################### ACESTREAM ######################        
-try :
-    command = [ ACESTREAM_BINARY, "--client-console", "--http-port", "33666", 
-                    "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
-                    "", "--bind-all", ACESTREAM_ARGS]
-    acestream_process = subprocess.Popen(command, 
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def acestream_amd64_cmd():
+        ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
+        command = [ ACESTREAM_BINARY, "--client-console", "--http-port", f"{ACESTREAM_PORT}", 
+                        "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
+                        "", "--bind-all", ACESTREAM_ARGS]
+        return command
+    
+def acestream_arm64_cmd():
+        ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine-arm64") + "/acestreamengine"
+        command = [ ACESTREAM_BINARY, "--client-console", "--http-port", f"{ACESTREAM_PORT}", 
+                        "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
+                        "", "--bind-all", ACESTREAM_ARGS]
+        return command
+    
+def acestream_macos_cmd():
+        ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine-arm64") + "/acestreamengine"
+        command = [ ACESTREAM_BINARY, "--client-console", "--http-port", f"{ACESTREAM_PORT}", 
+                        "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
+                        "", "--bind-all", ACESTREAM_ARGS]
+        return command
+try:    
+    match platform.system():
+        case "Linux":
+            match platform.processor():
+                case "arm64":
+                    command = acestream_arm64_cmd()
+                case _:
+                    command = acestream_amd64_cmd()
+        case "Darwin":
+            command = None
+        case default:
+            raise Exception(f"Unsupported platform: {platform.system()}")
+        
+    if command :
+        logger.info("Executing Acestream process: %s", command)
+        acestream_process = subprocess.Popen(command, 
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    else:
+        logger.info(f"Acestream binnary not found, using external Acestream on http://{ACESTREAM_IPADDRESS}:{ACESTREAM_PORT}")
 except Exception as e:
     logger.error("Error starting acestream")
     logger.error(e)
-
+    
 @app.get("/acestream/video")
 async def acestream(request: Request):
     id = request.query_params.get('id')
     if not id:
         raise HTTPException(status_code=400, detail="id parameter is missing")
 
-    if not acestream_process or acestream_process.poll() is not None:
-        raise HTTPException(status_code=500, detail="Video not found")    
+    # if not acestream_process or acestream_process.poll() is not None:
+    #     raise HTTPException(status_code=500, detail="Video not found")    
 
     def stream_content(id):
-        ace_url = f"http://127.0.0.1:33666/ace/getstream?id={id}"
+        ace_url = f"http://{ACESTREAM_IPADDRESS}:{ACESTREAM_PORT}/ace/getstream?id={id}"
         session = requests.Session()
         retry = Retry(
             total = int(ACESTRAM_RETRY_TOTAL),
