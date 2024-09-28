@@ -6,7 +6,7 @@ ACECHROOT="androidfs"
 mkdir acestream
 tar zxf "${ACESTREAM_TGZ}" -C acestream
 rm -rf "${ACESTREAM_TGZ}"
-mv acestream-armv7-master $ACEADDON
+mv acestream $ACEADDON
 
 mkdir -p $ACEADDON/$ACECHROOT/system
 mkdir -p $ACEADDON/$ACECHROOT/storage
@@ -14,6 +14,8 @@ mkdir -p $ACEADDON/$ACECHROOT/dev
 mkdir -p $ACEADDON/$ACECHROOT/proc
 mkdir -p $ACEADDON/$ACECHROOT/sys
 mkdir -p $ACEADDON/$ACECHROOT/system/etc
+
+find /opt/acestream
 
 cp -L /etc/resolv.conf $ACEADDON/$ACECHROOT/system/etc/resolv.conf
 echo "67.215.246.10 router.bittorrent.com" >> $ACEADDON/$ACECHROOT/system/etc/hosts
