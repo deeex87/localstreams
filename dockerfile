@@ -21,11 +21,10 @@ RUN echo "67.215.246.10 router.utorrent.com" >> /etc/hosts
 RUN echo "82.221.103.244 router.utorrent.com" >> /etc/hosts
 
 RUN apt-get update
+RUN apt-get install --no-install-recommends -y \
+python3-pip libpython3.10 ffmpeg python3-pip python3-virtualenv python3-venv ca-certificates wget sudo
 
-
-# RUN apt-get install --no-install-recommends -y \
-# python3-pip libpython3.10 ffmpeg python3-pip python3-virtualenv python3-venv ca-certificates wget sudo\
-#   && rm -rf /var/lib/apt/lists/* \
+# RUN rm -rf /var/lib/apt/lists/* \
 #   && mkdir acestream \
 #   && tar zxf "${ACESTREAM_TGZ}" -C acestream \
 #   && rm "${ACESTREAM_TGZ}" \
