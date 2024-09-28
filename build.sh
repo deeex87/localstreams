@@ -1,4 +1,5 @@
 #!/bin/bash
+git pull
 PROJECT_NAME="localstreams"
 IMAGE_NAME="franlerma/$PROJECT_NAME"
 docker build . -t $IMAGE_NAME || exit 1
