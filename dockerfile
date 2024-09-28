@@ -6,8 +6,7 @@ LABEL \
     org.opencontainers.image.authors="Fran Lerma" \
     org.opencontainers.image.url=""
 
-ENV ACESTREAM_TGZ="acestream_3.2.3_ubuntu_22.04_x86_64_py3.10.tar.gz"
-ENV ACESTREAM_TGZ_URL="https://download.acestream.media/linux/${ACESTREAM_TGZ}"
+#ENV ACESTREAM_TGZ_URL="https://download.acestream.media/linux/${ACESTREAM_TGZ}"
 
 WORKDIR /tmp
 COPY app /app
