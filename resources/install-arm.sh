@@ -3,7 +3,7 @@ ACESTREAM_TGZ="acestream-armv7-master.tar.gz"
 ACEADDON="/opt/acestream"
 ACECHROOT="androidfs"
 
-cd /tmp
+mkdir acestream
 tar zxf "${ACESTREAM_TGZ}" -C acestream
 rm -rf "${ACESTREAM_TGZ}"
 mv acestream-armv7-master $ACEADDON
