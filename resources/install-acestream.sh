@@ -1,6 +1,8 @@
 #!/bin/bash
 ARCH=$(uname -m)
 echo $ARCH
+
+cd /resources
 if [ "$ARCH" = "x86_64" ]; then
   bash ./install-amd64.sh
 elif [ "$ARCH" = "arm64" ]; then
