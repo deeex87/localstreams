@@ -6,7 +6,7 @@ ACECHROOT="androidfs"
 mkdir acestream
 tar zxf "${ACESTREAM_TGZ}" -C acestream
 rm -rf "${ACESTREAM_TGZ}"
-mv acestream $ACEADDON
+mv acestream/acestream-armv7-master $ACEADDON
 
 mkdir -p $ACEADDON/$ACECHROOT/system
 mkdir -p $ACEADDON/$ACECHROOT/storage
