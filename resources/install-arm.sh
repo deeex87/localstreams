@@ -1,11 +1,8 @@
 #!/bin/bash
-
 ACESTREAM_TGZ="acestream-armv7-master.tar.gz"
-
 ACEADDON="/opt/acestream"
 ACECHROOT="androidfs"
 
-cd /resources
 tar zxf "${ACESTREAM_TGZ}" -C acestream
 mv acestream-armv7-master $ACEADDON
 
