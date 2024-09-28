@@ -31,6 +31,7 @@ RUN apt-get update
 #   && pushd /opt/acestream || exit \
 #   && bash ./install_dependencies.sh \
 #   && popd || exit
+RUN chmod +x /resources/install-acestream.sh
 RUN /resources/install-acestream.sh
 
 RUN virtualenv -p python3.10 /app/venv
