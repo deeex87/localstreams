@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 
 
 app = FastAPI()
+# end match 
 
 ACESTREAM_CACHE_DIR = "/tmp/acestream-cache"
 APP_PORT=int(os.getenv("APP_PORT", "15123"))
@@ -38,6 +39,19 @@ templates = Jinja2Templates(directory=M3U_DIR)
 #LOGGER
 logger = logging.getLogger('uvicorn.error')
 logger.setLevel(logging.getLevelName(LOG_LEVEL))
+        
+match platform.system():
+    case "Linux":
+        match platform.processor():
+            case "arm64":
+                from app.acestream.acestream_amd64 import launch_acestream_arm as launch_acestream
+            case _:
+                from acestream.acestream_arm import launch_acestream_amd64 as launch_acestream
+    case "Darwin":
+        launch_acestream = None
+        command = None
+    case default:
+        raise Exception(f"Unsupported platform: {platform.system()}")
 
 ###################### STREAMLINK ######################
 
@@ -152,44 +166,11 @@ async def get_audio(request: Request):
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
     
-###################### ACESTREAM ######################        
-def acestream_amd64_cmd():
-        ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine")
-        command = [ ACESTREAM_BINARY, "--client-console", "--http-port", f"{ACESTREAM_PORT}", 
-                        "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
-                        "", "--bind-all", ACESTREAM_ARGS]
-        return command
-    
-def acestream_arm64_cmd():
-        ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine-arm64") + "/acestreamengine"
-        command = [ ACESTREAM_BINARY, "--client-console", "--http-port", f"{ACESTREAM_PORT}", 
-                        "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
-                        "", "--bind-all", ACESTREAM_ARGS]
-        return command
-    
-def acestream_macos_cmd():
-        ACESTREAM_BINARY = os.getenv("ACESTREAM_BINARY", "/opt/acestream/acestreamengine-arm64") + "/acestreamengine"
-        command = [ ACESTREAM_BINARY, "--client-console", "--http-port", f"{ACESTREAM_PORT}", 
-                        "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
-                        "", "--bind-all", ACESTREAM_ARGS]
-        return command
-try:    
-    match platform.system():
-        case "Linux":
-            match platform.processor():
-                case "arm64":
-                    command = acestream_arm64_cmd()
-                case _:
-                    command = acestream_amd64_cmd()
-        case "Darwin":
-            command = None
-        case default:
-            raise Exception(f"Unsupported platform: {platform.system()}")
-        
-    if command :
+try:       
+    if launch_acestream :
+        launch_acestream(ACESTREAM_ARGS, ACESTREAM_PORT, ACESTREAM_CACHE_DIR)
         logger.info("Executing Acestream process: %s", command)
-        acestream_process = subprocess.Popen(command, 
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
     else:
         logger.info(f"Acestream binnary not found, using external Acestream on http://{ACESTREAM_IPADDRESS}:{ACESTREAM_PORT}")
 except Exception as e:
