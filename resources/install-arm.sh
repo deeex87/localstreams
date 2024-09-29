@@ -22,11 +22,20 @@ echo "67.215.246.10 router.bittorrent.com" >> $ACEADDON/$ACECHROOT/system/etc/ho
 echo "212.129.33.59 dht.transmissionbt.com" >> $ACEADDON/$ACECHROOT/system/etc/hosts
 echo "82.221.103.244 router.utorrent.com" >> $ACEADDON/$ACECHROOT/system/etc/hosts
 
-mount -o bind /dev $ACEADDON/$ACECHROOT/dev &>/dev/null
-mount -t proc proc $ACEADDON/$ACECHROOT/proc &>/dev/null
-mount -t sysfs sysfs $ACEADDON/$ACECHROOT/sys &>/dev/null
+# mount -o bind /dev $ACEADDON/$ACECHROOT/dev &>/dev/null
+# mount -t proc proc $ACEADDON/$ACECHROOT/proc &>/dev/null
+# mount -t sysfs sysfs $ACEADDON/$ACECHROOT/sys &>/dev/null
 
-chown -R root:root $ACEADDON/$ACECHROOT/system
+# chown -R root:root $ACEADDON/$ACECHROOT/system
+
+mv $ACEADDON/$ACECHROOT/system /system
+mv $ACEADDON/$ACECHROOT/acestream.engine /
+mkdir -p /storage
+chown -R root:root /system
+find /system -type d -exec chmod 755 {} \;
+find /system -type f -exec chmod 644 {} \;
+chmod 755 /system/bin/* /acestream.engine/python/bin/python
+
 find $ACEADDON/$ACECHROOT/system -type d -exec chmod 755 {} \;
 find $ACEADDON/$ACECHROOT/system -type f -exec chmod 644 {} \;
 
