@@ -44,9 +44,9 @@ match platform.system():
     case "Linux":
         match platform.processor():
             case "arm64":
-                from .acestream.acestream_amd64 import launch_acestream_arm as launch_acestream
+                from acestream.acestream_arm import launch_acestream_arm as launch_acestream
             case _:
-                from .acestream.acestream_arm import launch_acestream_amd64 as launch_acestream
+                from acestream.acestream_amd64 import launch_acestream_amd64 as launch_acestream
     case "Darwin":
         launch_acestream = None
         command = None
