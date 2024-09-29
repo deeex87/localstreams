@@ -40,6 +40,7 @@ templates = Jinja2Templates(directory=M3U_DIR)
 logger = logging.getLogger('uvicorn.error')
 logger.setLevel(logging.getLevelName(LOG_LEVEL))
         
+logger.error(platform.system() + " " + platform.processor())
 match platform.system():
     case "Linux":
         match platform.processor():
@@ -215,5 +216,5 @@ if __name__ == '__main__':
     import uvicorn
     from uvicorn.config import LOGGING_CONFIG
     LOGGING_CONFIG["formatters"]["default"]["fmt"] = "%(asctime)s [%(name)s] %(levelprefix)s %(message)s"
-    uvicorn.run(app, host='0.0.0.0', port=APP_PORT)
+    uvicorn.run(app, host='0.0.0.0', port=APP_PORT, log_config=LOGGING_CONFIG)
 
