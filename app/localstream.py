@@ -169,8 +169,8 @@ async def get_audio(request: Request):
     
 try:       
     if launch_acestream :
-        launch_acestream(ACESTREAM_ARGS, ACESTREAM_PORT, ACESTREAM_CACHE_DIR)
-        
+        process, command = launch_acestream(ACESTREAM_ARGS, ACESTREAM_PORT, ACESTREAM_CACHE_DIR)
+        logger.info(f"Ejecutado Acestream: {process.pid}") 
     else:
         logger.info(f"Acestream binnary not found, using external Acestream on http://{ACESTREAM_IPADDRESS}:{ACESTREAM_PORT}")
 except Exception as e:
