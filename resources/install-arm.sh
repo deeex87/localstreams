@@ -36,6 +36,4 @@ find /system -type d -exec chmod 755 {} \;
 find /system -type f -exec chmod 644 {} \;
 chmod 755 /system/bin/* /acestream.engine/python/bin/python
 
-chmod 755 $ACEADDON/$ACECHROOT/system/bin/* $ACEADDON/$ACECHROOT/acestream.engine/python/bin/python
-
 #chroot $ACEADDON/$ACECHROOT /system/bin/busybox sh -c "/system/bin/acestream.sh" > $ACEADDON/acestream.log 2>&1
