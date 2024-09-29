@@ -15,7 +15,7 @@ mkdir -p $ACEADDON/$ACECHROOT/proc
 mkdir -p $ACEADDON/$ACECHROOT/sys
 mkdir -p $ACEADDON/$ACECHROOT/system/etc
 
-find /opt/acestream
+#find /opt/acestream
 
 cp -L /etc/resolv.conf $ACEADDON/$ACECHROOT/system/etc/resolv.conf
 echo "67.215.246.10 router.bittorrent.com" >> $ACEADDON/$ACECHROOT/system/etc/hosts
