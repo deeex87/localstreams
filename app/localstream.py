@@ -173,37 +173,47 @@ def acestream_macos_cmd():
                         "--cache-dir", f"{ACESTREAM_CACHE_DIR}", #"--cache-limit", f"{ACESTREAM_CACHE_LIMIT}", 
                         "", "--bind-all", ACESTREAM_ARGS]
         return command
-try:    
-    match platform.system():
-        case "Linux":
-            match platform.processor():
-                case "arm64":
-                    command = acestream_arm64_cmd()
-                case _:
-                    command = acestream_amd64_cmd()
-        case "Darwin":
-            command = None
-        case default:
-            raise Exception(f"Unsupported platform: {platform.system()}")
-        
-    if command :
-        logger.info("Executing Acestream process: %s", command)
-        acestream_process = subprocess.Popen(command, 
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    else:
-        logger.info(f"Acestream binnary not found, using external Acestream on http://{ACESTREAM_IPADDRESS}:{ACESTREAM_PORT}")
-except Exception as e:
-    logger.error("Error starting acestream")
-    logger.error(e)
+
+def run_acestream():
+    try:    
+        match platform.system():
+            case "Linux":
+                match platform.processor():
+                    case "arm64":
+                        command = acestream_arm64_cmd()
+                    case _:
+                        command = acestream_amd64_cmd()
+            case "Darwin":
+                command = None
+            case default:
+                raise Exception(f"Unsupported platform: {platform.system()}")
+            
+        if command :
+            logger.info("Executing Acestream process: %s", command)
+            acestream_process = subprocess.Popen(command, 
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            return acestream_process
+        else:
+            logger.info(f"Acestream binnary not found, using external Acestream on http://{ACESTREAM_IPADDRESS}:{ACESTREAM_PORT}")
+    except Exception as e:
+        logger.error("Error starting acestream")
+        logger.error(e)
+        return None
+
+acestream_process = run_acestream()
     
 @app.get("/acestream/video")
 async def acestream(request: Request):
+    global acestream_process
     id = request.query_params.get('id')
     if not id:
         raise HTTPException(status_code=400, detail="id parameter is missing")
 
-    # if not acestream_process or acestream_process.poll() is not None:
-    #     raise HTTPException(status_code=500, detail="Video not found")    
+    if not acestream_process or acestream_process.poll() is not None:
+        logger.error("Acestream process terminated, restarting")
+        acestream_process = run_acestream()
+        time.sleep(3)
 
     def stream_content(id):
         ace_url = f"http://{ACESTREAM_IPADDRESS}:{ACESTREAM_PORT}/ace/getstream?id={id}"
